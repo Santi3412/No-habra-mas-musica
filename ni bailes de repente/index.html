@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nuestra Brújula</title>
+    <style>
+        /* Estilos básicos para que se vea lindo y limpio */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            transition: background 1s ease;
+        }
+
+        h1 {
+            color: #0369a1;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Contenedor de la Brújula */
+        .compass-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        .compass-dial {
+            width: 100%;
+            height: 100%;
+            border: 8px solid #0284c7;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.1s ease-out;
+            position: relative;
+        }
+
+        /* La aguja de la brújula */
+        .needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 100px;
+            background: linear-gradient(to bottom, #ef4444 50%, #94a3b8 50%);
+            transform: translate(-50%, -50%);
+            border-radius: 6px;
+        }
+
+        /* Botón obligatorio para iPhone */
+        #btn-permiso {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+            z-index: 10;
+        }
+
+        /* Zona de la animación de playa (oculta por defecto) */
+        #playa-animacion {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fef08a; /* Color arena de fondo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Cuando se activa, mostramos la playa */
+        body.mirando-al-mar #playa-animacion {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="btn-permiso">Comenzar la magia ✨</button>
+
+    <div id="app-content" style="display: none; display: flex; flex-direction: column; align-items: center;">
+        <h1>¿Hacia dónde está el mar?</h1>
+        <div class="compass-container">
+            <div class="compass-dial" id="brujula">
+                <div class="needle"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor para la animación/sorpresa -->
+    <div id="playa-animacion">
+        🏖️🌊🌴
+    </div>
+
+    <script>
+        const btnPermiso = document.getElementById('btn-permiso');
+        const appContent = document.getElementById('app-content');
+        const brujula = document.getElementById('brujula');
+        const body = document.body;
+
+        btnPermiso.addEventListener('click', () => {
+            // Preguntamos si es un iPhone/iOS moderno
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            activarBrujula();
+                        } else {
+                            alert('¡Necesitamos el permiso para que funcione la brújula! 😢');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Para Android o PC que no necesitan permiso explícito por botón
+                activarBrujula();
+            }
+        });
+
+        function activarBrujula() {
+            btnPermiso.style.display = 'none';
+            appContent.style.display = 'flex';
+
+            window.addEventListener('deviceorientation', (event) => {
+                let grados = 0;
+
+                // Si es iPhone, usamos webkitCompassHeading
+                if (event.webkitCompassHeading) {
+                    grados = event.webkitCompassHeading;
+                } else {
+                    // Si es Android, usamos el alpha estándar
+                    grados = Math.abs(event.alpha - 360);
+                }
+
+                // Rotamos el dial de la brújula inversamente para que funcione bien
+                brujula.style.transform = `rotate(${-grados}deg)`;
+
+                // Supongamos que definimos el OESTE (alrededor de los 270 grados)
+                // Le damos un margen de error de 20 grados para cada lado (entre 250 y 290)
+                if (grados >= 250 && grados <= 290) {
+                    body.classList.add('mirando-al-mar');
+                } else {
+                    body.classList.remove('mirando-al-mar');
+                }
+            }, true);
+        }
+    </script>
+</body>
+</html>
