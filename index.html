@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Para Vos ✨</title>
+    <style>
+        /* Estilos Globales - Fondo color arena suave por defecto */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f7f1e3;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            transition: background 1.5s ease-in-out;
+        }
+
+        /* Pantalla de inicio con el botón mágico */
+        #pantalla-inicio {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #pantalla-inicio p {
+            color: #847577;
+            font-size: 16px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        #btn-permiso {
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: #d1ccc0;
+            color: #2c2c54;
+            border: 1px solid #b3ad9e;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+
+        #btn-permiso:active {
+            transform: scale(0.97);
+            background-color: #c5beb0;
+        }
+
+        /* Contenedor Principal de la App (Oculto al inicio) */
+        #app-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        h1 {
+            color: #57606f;
+            font-weight: 300;
+            font-size: 20px;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            transition: color 1.5s ease;
+        }
+
+        /* Diseño Minimalista de la Brújula */
+        .compass-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+        }
+
+        .compass-dial {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #d1ccc0;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: transform 0.1s ease-out, border-color 1.5s ease, background-color 1.5s ease;
+            position: relative;
+        }
+
+        /* Marcadores de los puntos cardinales (Norte y Este discretos) */
+        .compass-dial::before {
+            content: 'N';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #a4b0be;
+            font-weight: bold;
+        }
+        
+        .compass-dial::after {
+            content: 'E';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #a4b0be;
+            font-weight: bold;
+        }
+
+        /* Aguja estilizada (una línea fina y elegante) */
+        .needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 120px;
+            background: linear-gradient(to bottom, #ff6b6b 50%, #747d8c 50%);
+            transform: translate(-50%, -50%);
+            transition: background 1.5s ease;
+        }
+
+        /* Círculo central sutil */
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            border: 2px solid #747d8c;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Capa de Sorpresa/Playa (Mensaje flotante) */
+        #mensaje-mar {
+            margin-top: 40px;
+            font-size: 16px;
+            color: #ffffff;
+            font-style: italic;
+            font-weight: 300;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 1.5s ease;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        /* =======================================================
+           ESTADOS CUANDO APUNTA AL MAR (ESTE)
+           ======================================================= */
+        body.mirando-al-mar {
+            /* Cambia el fondo a un degradado de mar hermoso */
+            background-color: #0093e9;
+            background-image: linear-gradient(160deg, #0093e9 0%, #80d0c7 100%);
+        }
+
+        body.mirando-al-mar h1 {
+            color: #ffffff;
+        }
+
+        body.mirando-al-mar .compass-dial {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        body.mirando-al-mar .needle {
+            background: linear-gradient(to bottom, #ffffff 50%, rgba(255,255,255,0.4) 50%);
+        }
+
+        body.mirando-al-mar #mensaje-mar {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Bienvenida -->
+    <div id="pantalla-inicio">
+        <p>Tengo algo que mostrarte...</p>
+        <button id="btn-permiso">Abrir regalo ✨</button>
+    </div>
+
+    <!-- Contenido de la Brújula -->
+    <div id="app-content">
+        <h1 id="titulo">Buscando el mar...</h1>
+        
+        <div class="compass-container">
+            <div class="compass-dial" id="brujula">
+                <div class="needle"></div>
+                <div class="center-dot"></div>
+            </div>
+        </div>
+
+        <!-- El mensaje especial que aparece al mirar al Este -->
+        <div id="mensaje-mar">
+            Ahí está el mar... <br>y hacia allá se va mi mente cada vez que pienso en vos. 🌊
+        </div>
+    </div>
+
+    <script>
+        const btnPermiso = document.getElementById('btn-permiso');
+        const pantallaInicio = document.getElementById('pantalla-inicio');
+        const appContent = document.getElementById('app-content');
+        const brujula = document.getElementById('brujula');
+        const titulo = document.getElementById('titulo');
+        const body = document.body;
+
+        btnPermiso.addEventListener('click', () => {
+            // Permisos obligatorios para iPhone (iOS)
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            iniciarApp();
+                        } else {
+                            alert('Para que la magia funcione, la brújula necesita tu permiso. 🥺');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Navegadores que no requieren permiso explícito
+                iniciarApp();
+            }
+        });
+
+        function iniciarApp() {
+            // Transición suave entre pantallas
+            pantallaInicio.style.display = 'none';
+            appContent.style.display = 'flex';
+            setTimeout(() => {
+                appContent.style.opacity = '1';
+            }, 50);
+
+            // Escuchar los sensores del celular
+            window.addEventListener('deviceorientation', (event) => {
+                let grados = 0;
+
+                // Captura de grados según el sistema operativo
+                if (event.webkitCompassHeading) {
+                    grados = event.webkitCompassHeading; // Exclusivo de iPhone
+                } else {
+                    grados = Math.abs(event.alpha - 360); // Android / Otros
+                }
+
+                // Rotación visual de la aguja
+                brujula.style.transform = `rotate(${-grados}deg)`;
+
+                // CONFIGURACIÓN DEL MAR: ESTE (~90 grados)
+                // Se activa si el celular apunta entre los 65° y los 115°
+                if (grados >= 65 && grados <= 115) {
+                    body.classList.add('mirando-al-mar');
+                    titulo.innerText = "¡Encontraste el mar!";
+                } else {
+                    body.classList.remove('mirando-al-mar');
+                    titulo.innerText = "Buscando el mar...";
+                }
+            }, true);
+        }
+    </script>
+</body>
+</html>
